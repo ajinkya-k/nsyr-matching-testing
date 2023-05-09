@@ -3,8 +3,7 @@
 Repository with code for the matching, testing, and simulation studies for the NSYR sports participation study.
 Pre-analysis protocol is available on arXiv: [arXiv:2211.02104](https://arxiv.org/abs/2211.02104).
 
-
-# Usage
+## Usage
 
 To use the code given in this repository, three things are required:
 
@@ -35,10 +34,18 @@ trt_hierarcy <- list(
     "tr_no_collision" = "tr_any_contact"
 )
 ```
-Once all of these are defined run using the following template: 
+
+Once all of these are defined run using the following template:
+
 ```r
+# Source in all the matching functionality files
+source("matching/balance_functions.R")
+source("matching/best_vr_match.R")
+source("matching/best_full_match.R")
+source("matching/match_utils.R")
 source("matching/matching_wrapper_functions.R")
 
+# call the top-level function to perform matching for the entire tree
 full_matches <- full_match_for_tree(
     dt_covars_treat, # dataframe with IDS, the covariates, treatments, and prop scores for treatments
     dt_outcome, # dataframe containing outcomes

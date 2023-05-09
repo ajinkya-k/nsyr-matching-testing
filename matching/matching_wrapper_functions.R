@@ -1,13 +1,3 @@
-source("balance_functions.R")
-source("best_vr_match.R")
-source("best_full_match.R")
-source("match_utils.R")
-
-
-
-
-
-
 
 # 1. dt_covars_treat: dataframe with IDS, the covariates, treatments, and prop scores for treatments
 # for each trt say tr_name, the propensity score column should be named prop_tr_name
