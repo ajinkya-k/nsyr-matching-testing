@@ -3,9 +3,9 @@
 Repository with code for the matching, testing, and simulation studies for the NSYR sports participation study.
 Pre-analysis protocol is available on arXiv: [arXiv:2211.02104](https://arxiv.org/abs/2211.02104).
 
-## Usage
+## Matching
 
-To use the code given in this repository, three things are required:
+To use the matching code, three things are required:
 
 1. A dataframe with the covariates and the treatments.
 2. A list of the names of the treatment variables
@@ -60,5 +60,24 @@ full_matches <- full_match_for_tree(
     max_K = NULL # max K to use in full matching with control-to-exposure is between 1:K and K:1
 )
 ```
+
+## Testing
+
+### Installing the Dependencies
+
+#### Gurobi Optimizer
+
+For the binary testing, Gurobi needs to be installed.
+Follow the instructions here [for installing the Gurobi Optimizer and the associated R installation](https://cran.r-project.org/web/packages/prioritizr/vignettes/gurobi_installation_guide.html).
+Note that an academic license for the Gurobi Optimizer is available on their website.
+(Note: The Gurobi `R` package also requires the `slam` package.)
+
+#### Other `R` packages
+
+The continuous testing requires the `sensitivityfull` package in `R` which can be found [on CRAN](https://cran.r-project.org/web/packages/sensitivityfull/index.html).
+
+### Usage
+
+
 
 [^1]: Ajinkya H. Kokandakar, Yuzhou Lin, Steven Jin, Jordan Weiss, Amanda R. Rabinowitz, Reuben A. Buford May, Sameer K. Deshpande, Dylan Small. _Protocol for an observational study on the effects of adolescent sports participation on health in early adulthood_. [arXiv:2211.02104](https://arxiv.org/abs/2211.02104)

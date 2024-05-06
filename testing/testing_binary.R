@@ -9,12 +9,16 @@ source("https://raw.githubusercontent.com/colinbfogarty/SensitivityCompositeBina
 # - decisions: was each hyp was accepted(ACC), rejected(REJ) or not tested(DNT)
 #NOTE the term ``accepted'' is only used for simplicty, it means fail to reject
 
+#TODO: Needs an IDS column!!!!!!
+
 hier_binary_tests <- function(
     dt_outcome_trt,  # dataframe with observed outcomes, treatment, and stratum
     treat_names,     # treatment column names
     strat_names,     # named list mapping trt colname -> stratum colname
+    outcome_name,    # name of the outcome column
     treat_hierarchy, # named list mapping trt colname -> parent trt colname
-    p_budget         # named list mapping trt colname -> type I budget
+    p_budget,        # named list mapping trt colname -> type I budget,
+    fwer             # Family Wise Error Rate (for uncorrected intervals)
 ) {
 
     n_treat <- length(treat_hierarchy)
@@ -30,32 +34,76 @@ hier_binary_tests <- function(
     rej_v <- rep("DNT", n_treat)
     names(rej_v) <- names(treat_hierarchy)
 
+    unc_tau_est <- rep(NA, n_treat)
+    names(unc_tau_est) <- names(treat_hierarchy)
+
+    cor_tau_est <- rep(NA, n_treat)
+    names(cor_tau_est) <- names(treat_hierarchy)
+
+    unc_confints = list()
+    cor_confints = list()
+    unc_conf_objects = list()
+    cor_conf_objects = list()
+    unc_conf_levels = list()
+    cor_conf_levels = list()
+
     for (tvar in treat_names) {
         strat_colname <- strat_names[[tvar]]
         trt_colname <-  tvar
         trt_parent <- treat_hierarchy[[trt_colname]]
 
-        if (is.na(trt_parent) || rej_v[trt_parent] == "REJ") {
             # genereate subset for matched samples
             df_tmp <- dt_outcome_trt %>%
                 filter(!is.na(get(strat_colname)))
 
             # run test
-            comp_test <- compositeBinary( # test of coposite null
+            unc_comp_test <- compositeBinary( # test of coposite null
                 df_tmp[[strat_colname]],
-                df_tmp$y,
-                df_tmp[[trt_colname]]
+                df_tmp[[outcome_name]],
+                df_tmp[[trt_colname]],
+                alpha = fwer
             )
 
-            p_vals[[trt_colname]] <- comp_test$pval
+        unc_tau_est[[trt_colname]] <- unc_comp_test$estimate
+        p_vals[[trt_colname]] <- unc_comp_test$pval
+        unc_confints[[trt_colname]] <- unc_comp_test$confint
+        unc_conf_levels[[trt_colname]] <- unc_comp_test$confidencelevel
+        unc_conf_objects[[trt_colname]] <- unc_comp_test
+
+        cor_comp_test <- compositeBinary( # test of coposite null
+                df_tmp[[strat_colname]],
+                df_tmp[[outcome_name]],
+                df_tmp[[trt_colname]],
+                alpha = p_budget[[trt_colname]]
+        )
+
+        cor_tau_est[[trt_colname]] <- cor_comp_test$estimate
+        cor_confints[[trt_colname]] <- cor_comp_test$confint
+        cor_conf_levels[[trt_colname]] <- cor_comp_test$confidencelevel
+        cor_conf_objects[[trt_colname]] <- cor_comp_test
+
+
+        # run test only if root or parent rejected
+        if (trt_parent == "root" | rej_v[trt_parent] == "REJ") {
             rej_v[[trt_colname]] <- ifelse(
-                comp_test$pval < p_budget[[trt_colname]],
+                unc_comp_test$pval < p_budget[[trt_colname]],
                 "REJ", "ACC"
             )
         }
     }
 
     return(
-        list(p_values = p_vals, decisions = rej_v)
+        list(
+            p_values = p_vals,
+            decisions = rej_v,
+            unc_tau_est = unc_tau_est,
+            unc_confints = unc_confints,
+            unc_confint_objects = unc_conf_objects,
+            unc_conf_levels = unc_conf_levels,
+            cor_tau_est = cor_tau_est,
+            cor_confints = cor_confints,
+            cor_confint_objects = cor_conf_objects,
+            cor_conf_levels = cor_conf_levels
+        )
     )
 }
