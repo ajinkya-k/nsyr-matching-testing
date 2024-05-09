@@ -19,7 +19,8 @@ hier_continuous_tests <- function(
     outcome_name,    # name of the outcome column
     treat_hierarchy, # named list mapping trt colname -> parent trt colname
     p_budget,        # named list mapping trt colname -> type I budget
-    fwer             # Family Wise Error Rate (for uncorrected intervals)
+    fwer,            # Family Wise Error Rate (for uncorrected intervals)
+    gamma            # sensitivity parameter
 ) {
 
     n_treat <- length(treat_hierarchy)
@@ -97,20 +98,20 @@ hier_continuous_tests <- function(
             # m-test for one side
             sentest_gt <- senfm(
                 ymat, as.logical(first_trt), # data
-                gamma = 1, inner = 0, trim = 3, lambda = 1/2, #parameters
+                gamma = gamma, inner = 0, trim = 3, lambda = 1/2, #parameters
                 tau = 0, # null value
                 alternative = "greater" # type of test
             )
 
             confint_cor <- senfmCI(
                 ymat, as.logical(first_trt), # data
-                gamma = 1, inner = 0, trim = 3, lambda = 1/2,
+                gamma = gamma, inner = 0, trim = 3, lambda = 1/2,
                 alpha = p_budget[[trt_colname]],
                 twosided = TRUE
             )
             confint_unc <- senfmCI(
                 ymat, as.logical(first_trt), # data
-                gamma = 1, inner = 0, trim = 3, lambda = 1/2,
+                gamma = gamma, inner = 0, trim = 3, lambda = 1/2,
                 alpha = fwer,
                 twosided = TRUE
             )
@@ -126,7 +127,7 @@ hier_continuous_tests <- function(
             # m-test for the other side
             sentest_lt <- senfm(
                 ymat, as.logical(first_trt), # data
-                gamma = 1, inner = 0, trim = 3, lambda = 1/2, # parameters
+                gamma = gamma, inner = 0, trim = 3, lambda = 1/2, # parameters
                 tau = 0, # null
                 alternative = "less" # type of test
             )

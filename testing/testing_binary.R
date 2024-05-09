@@ -18,7 +18,8 @@ hier_binary_tests <- function(
     outcome_name,    # name of the outcome column
     treat_hierarchy, # named list mapping trt colname -> parent trt colname
     p_budget,        # named list mapping trt colname -> type I budget,
-    fwer             # Family Wise Error Rate (for uncorrected intervals)
+    fwer,            # Family Wise Error Rate (for uncorrected intervals)
+    gamma            # sensitivity parameter
 ) {
 
     n_treat <- length(treat_hierarchy)
@@ -61,7 +62,8 @@ hier_binary_tests <- function(
                 df_tmp[[strat_colname]],
                 df_tmp[[outcome_name]],
                 df_tmp[[trt_colname]],
-                alpha = fwer
+                alpha = fwer,
+                Gamma = gamma
             )
 
         unc_tau_est[[trt_colname]] <- unc_comp_test$estimate
@@ -74,7 +76,8 @@ hier_binary_tests <- function(
                 df_tmp[[strat_colname]],
                 df_tmp[[outcome_name]],
                 df_tmp[[trt_colname]],
-                alpha = p_budget[[trt_colname]]
+                alpha = p_budget[[trt_colname]],
+                Gamma = gamma
         )
 
         cor_tau_est[[trt_colname]] <- cor_comp_test$estimate
