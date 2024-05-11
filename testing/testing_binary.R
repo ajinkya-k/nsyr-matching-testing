@@ -49,6 +49,7 @@ hier_binary_tests <- function(
     cor_conf_levels = list()
 
     for (tvar in treat_names) {
+        print(paste0("Binary test for ", tvar))
         strat_colname <- strat_names[[tvar]]
         trt_colname <-  tvar
         trt_parent <- treat_hierarchy[[trt_colname]]
