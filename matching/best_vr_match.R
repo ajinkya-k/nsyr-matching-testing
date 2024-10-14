@@ -143,7 +143,7 @@ best_vr_match_block <- function(prop_score_df, out_data, X_mat_full, max_K = 5, 
     K <- NULL
     match_index <- which(imbalance_counts[,"Post-match"] < 2)
     if(length(match_index) != 0){
-      vr_n <- imbalance_conts[match_index, "n"]
+      vr_n <- imbalance_counts[match_index, "n"]
       K <- match_index[which.max(vr_n)]
       n_vr <- max(vr_n)
       print(paste("Will attempt a vr matching using", n_vr, "subjects and K = ", K))
